@@ -1,0 +1,84 @@
+{
+    "collection": {
+		"info": {
+			"_postman_id": "0af9ee41-e12a-419d-820e-df6acf5aa4ca",
+			"name": "Wardrobe App",
+			"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+			"_exporter_id": "33058035"
+	},
+		"item": [
+			{
+			"name": "Create Item",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\": \"yellow halterneck top\", \"category\": \"top\", \"tags\": [\"yellow\", \"top\", \"halterneck\", \"summer\", \"sleeveless\"], \"image\": \"some-base64 string representing a photo\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:3000/items"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Item",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:3000/items/66281005e35ee929d26c0628"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Item",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "localhost:3000/items/66280079e8fe2793d0840eb4"
+			},
+			"response": []
+		},
+		{
+			"name": "Search Item",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"tags\": [\"red\", \"summer\"]}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:3000/items/search"
+			},
+			"response": []
+			}
+		]
+    }
+}

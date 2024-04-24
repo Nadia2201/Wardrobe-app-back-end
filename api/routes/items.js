@@ -4,5 +4,7 @@ const router = express.Router();
 
 router.post("/", ItemsController.create);
 router.get("/:id", ItemsController.getItem);
+router.delete("/:id", ItemsController.removeItem);
+router.post("/search", ItemsController.searchByTags);
 
 module.exports = router;
