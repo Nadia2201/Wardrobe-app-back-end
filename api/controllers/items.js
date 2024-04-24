@@ -39,7 +39,7 @@ const removeItem = async (req, res) => {
     try {
         const itemId = req.params.id;
         const deletedItem = await Item.findByIdAndDelete(itemId);
-        res.status(200).json({ message: `Item deleted: ${itemId}`});
+        res.status(200).json({ message: `Item deleted: ${deletedItem}`});
     } catch (error) {
         res.status(500).json({ message: `Couldn't remove item: ${error.message}` });
     }
