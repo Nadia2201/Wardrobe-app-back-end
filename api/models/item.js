@@ -4,7 +4,7 @@ const ItemSchema = new mongoose.Schema({
     name: { type: String, required: true},
     category: { type: String, required: true},
     tags: [{ type: String }],
-    image: { type: String}, // Base64 encoded image
+    image: { type: Buffer}, // Base64 encoded image
 });
 
 const Item = mongoose.model("Item", ItemSchema);
