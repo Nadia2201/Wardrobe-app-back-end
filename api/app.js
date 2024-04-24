@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const usersRouter = require("./routes/users");
+const itemsRouter = require("./routes/items");
 
 const authenticationRouter = require("./routes/authentication");
 
@@ -21,7 +22,7 @@ app.use(bodyParser.json());
 
 // API Routes
 app.use("/users", usersRouter);
-
+app.use("/items", itemsRouter);
 app.use("/tokens", authenticationRouter);
 
 // 404 Handler
