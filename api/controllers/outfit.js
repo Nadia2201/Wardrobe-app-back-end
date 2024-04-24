@@ -49,8 +49,8 @@ const create = async (req, res) => {
 // };
 // 2. Save the outfit to database collection outfit.
 
-const OutfitController = {
+const OutfitsController = {
     create: create,
   };
   
-  module.exports = OutfitController;
+  module.exports = OutfitsController;

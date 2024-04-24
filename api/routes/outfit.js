@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const OutfitController = require("../controllers/outfit");
+const OutfitsController = require("../controllers/outfit");
 
-router.post("/", OutfitController.create);
-//router.get("/", OutfitController.getFavourites);
+router.post("/", OutfitsController.create);
+//router.get("/", OutfitsController.getFavourites);
 
 module.exports = router;

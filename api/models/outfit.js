@@ -9,6 +9,6 @@ const OutfitSchema = new mongoose.Schema({
   // favourite: { type: boolean, default: false} 
 });
 
-const Outfit = mongoose.model("Outfit", UserSchema);
+const Outfit = mongoose.model("Outfit", OutfitSchema);
 
 module.exports = Outfit;
