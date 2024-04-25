@@ -19,40 +19,25 @@ const create = async (req, res) => {
             return res.status(404).send({ error: "No items found" });
         }
 
-        // Return the name of the random item
-        res.send(randomItem[0].name);
+        const outfitDetails = { 
+            top: randomItem[0].name
+            //bottom: req.body.bottom, 
+            //shoes: req.body.shoes 
+            //image: req.body.image 
+        };
+
+        const outfit = new Outfit(outfitDetails);
+        console.log('newOutfit', Outfit);
+
+        await outfit.save();
+        res.status(201).json({ message: `Outfit created, id: ${outfit._id.toString()}`});
+
     } catch (error) {
         // Handle errors
         res.status(500).send({ error: error.message });
     }
-};
+    };
 //2. Save the outfit to database collection outfit.
-
-
-
-
-
-// const create = async (req, res) => {
-//     try {
-//         const outfitDetails = { 
-//             top: req.body.top, 
-//             bottom: req.body.bottom, 
-//             shoes: req.body.shoes 
-//             //image: req.body.image 
-//         };
-
-//         const outfit = new Outfit(outfitDetails);
-//         console.log('newOutfit', Outfit);
-
-//         await outfit.save();
-//         res.status(201).json({ message: `Outfit created, id: ${outfit._id.toString()}`});
-//     } 
-//     catch (error) {
-//         res.status(400).json({ message: `This went wrong: ${error.message}` });
-//     }
-// };
-
-
 
 
 const OutfitsController = {

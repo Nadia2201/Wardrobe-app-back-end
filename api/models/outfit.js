@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
 const OutfitSchema = new mongoose.Schema({
-  //automatically generated name: { type: String },
   top: { type: String },
   bottom: { type: String },
   shoes: { type: String },
-  // created at: Date
-  // favourite: { type: boolean, default: false} 
+  favourite: { type: Boolean, default: false }, 
+  createdAt: { type: Date, default: Date.now }
+  // image: advanced feature to combine top, bottom and shoes in one image. 
 });
 
 const Outfit = mongoose.model("Outfit", OutfitSchema);
