@@ -1,13 +1,18 @@
 const User = require("../models/user");
 const { generateToken } = require("../lib/token");
+const bcrypt = require('bcryptjs');
+const fs = require('fs');
 
 const create = async (req, res) => {
+  const imageToBase64 = fs.readFileSync(req.body.imgUrl);
+  const base64Image = Buffer.from(imageToBase64).toString('base64');
   try {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const userDetails = {
       email: req.body.email,
-      password: req.body.password,
+      password: hashedPassword,
       username: req.body.username,
-     // imgUrl: req.body.imgUrl ? req.body.imgUrl : "assets/blank-profile-picture-973460_640.png"
+      imgUrl: base64Image
     };
 
     const user = new User(userDetails);
