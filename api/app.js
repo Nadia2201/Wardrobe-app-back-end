@@ -4,6 +4,7 @@ const cors = require("cors");
 
 const usersRouter = require("./routes/users");
 const itemsRouter = require("./routes/items");
+const outfitsRouter = require("./routes/outfits")
 
 const authenticationRouter = require("./routes/authentication");
 
@@ -24,6 +25,7 @@ app.use(bodyParser.json());
 app.use("/users", usersRouter);
 app.use("/items", itemsRouter);
 app.use("/tokens", authenticationRouter);
+app.use("/outfits", outfitsRouter);
 
 // 404 Handler
 app.use((_req, res) => {
