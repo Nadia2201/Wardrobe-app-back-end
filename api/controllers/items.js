@@ -1,18 +1,23 @@
 const Item = require("../models/item");
 const fs = require('fs');
+const { getUserIdFromToken } = require("../middleware/tokenChecker")
+
 
 // Function to create a new item
 const create = async (req, res) => {
 
     const imageToBase64 = fs.readFileSync(req.body.image);
     const base64Image = Buffer.from(imageToBase64).toString('base64');
+    const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
+    const userId = getUserIdFromToken(token);
     
     try {
         const itemDetails = { 
             name: req.body.name, 
             category: req.body.category, 
             tags: req.body.tags, 
-            image: base64Image 
+            image: base64Image, 
+            userId: userId
         };
  
         const item = new Item(itemDetails);
