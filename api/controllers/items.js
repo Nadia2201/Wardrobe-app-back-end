@@ -1,15 +1,20 @@
 const Item = require("../models/item");
+const fs = require('fs');
 
 // Function to create a new item
 const create = async (req, res) => {
+
+    const imageToBase64 = fs.readFileSync(req.body.image);
+    const base64Image = Buffer.from(imageToBase64).toString('base64');
+    
     try {
         const itemDetails = { 
             name: req.body.name, 
             category: req.body.category, 
             tags: req.body.tags, 
-            image: req.body.image 
+            image: base64Image 
         };
-
+ 
         const item = new Item(itemDetails);
         console.log('newItem', item);
 

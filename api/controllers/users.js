@@ -7,7 +7,7 @@ const create = async (req, res) => {
       email: req.body.email,
       password: req.body.password,
       username: req.body.username,
-      imgUrl: req.body.imgUrl ? req.body.imgUrl : "assets/blank-profile-picture-973460_640.png"
+     // imgUrl: req.body.imgUrl ? req.body.imgUrl : "assets/blank-profile-picture-973460_640.png"
     };
 
     const user = new User(userDetails);
