@@ -2,28 +2,36 @@ const Outfit = require("../models/outfit");
 const Item = require('../models/item');
 // const { generateToken } = require("../lib/token");
 
-// Generate an outfit 
-// 1. Connect to database, pull a random item from collection items. 
+// Generate a random outfit: pull items from 'items' collection randomly, save it in 'outfit' collection.  
 
-//Function to get a random item name
 const create = async (req, res) => {
     try {
-        // Aggregate pipeline to fetch a random item name
-        const randomItem = await Item.aggregate([
-            { $sample: { size: 1 } }, // $sample stage to randomly select one document
-            //{ $project: { _id: 0, name: 1 } } // $project stage to include only the "name" field
+        const randomTopOrDress = await Item.aggregate([
+            { $match: { category: { $in: ["top", "dress"] } } },
+            { $sample: { size: 1 } }
         ]);
 
-        // Check if a random item was found
-        if (randomItem.length === 0) {
-            return res.status(404).send({ error: "No items found" });
+        // Find a random "bottom" if "top" was selected
+        let randomBottom = "";
+        if (randomTopOrDress[0].category === "top") {
+            const bottom = await Item.aggregate([
+                { $match: { category: "bottom" } },
+                { $sample: { size: 1 } }
+            ]);
+            randomBottom = bottom[0].name;
         }
 
+        // Find a random pair of "shoes"
+        const randomShoes = await Item.aggregate([
+            { $match: { category: "shoes" } },
+            { $sample: { size: 1 } }
+        ]);
+
         const outfitDetails = { 
-            top: randomItem[0].name
-            //bottom: req.body.bottom, 
-            //shoes: req.body.shoes 
-            //image: req.body.image 
+            top: randomTopOrDress[0].name,
+            bottom: randomBottom,
+            shoes: randomShoes[0].name
+            //image: req.body.image - this is an advanced feature to place the items as one image
         };
 
         const outfit = new Outfit(outfitDetails);
@@ -37,9 +45,7 @@ const create = async (req, res) => {
         res.status(500).send({ error: error.message });
     }
     };
-//2. Save the outfit to database collection outfit.
-
-
+    
 const OutfitsController = {
     create: create,
   };
