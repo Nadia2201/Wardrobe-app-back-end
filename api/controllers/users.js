@@ -7,12 +7,14 @@ const fs = require('fs');
 const JWT = require("jsonwebtoken");
 
 const create = async (req, res) => {
+
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const userDetails = {
       email: req.body.email,
       password: hashedPassword,
       username: req.body.username,
+
     };
 
     const user = new User(userDetails);

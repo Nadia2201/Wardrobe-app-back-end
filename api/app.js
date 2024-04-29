@@ -11,7 +11,13 @@ const { tokenChecker } = require("./middleware/tokenChecker"); // Destructure th
 const app = express();
 
 app.use(cors());
-app.use(bodyParser.json());
+
+
+
+
+// Parse JSON request bodies, made available on `req.body`
+app.use(bodyParser.json({limit: '10mb'}));
+
 
 // API Routes
 app.use("/users", usersRouter);
