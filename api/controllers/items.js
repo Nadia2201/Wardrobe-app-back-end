@@ -58,13 +58,32 @@ const searchByTags = async (req, res) => {
     }
 }
 
+const updateFav = async (req, res) => {
+    try {
+        _id = req.body._id;
+
+        const updatedItem = await Item.findOneAndUpdate(
+            { _id: _id },
+            { favourite: true }, // Set favourite to true
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedItem) {
+            return res.status(404).json({ error: "Item not found" });
+        }
+
+        res.status(200).json({ message: "Item favourite status updated", updatedItem });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 const ItemsController = {
     create: create,
     getItem: getItem,
     removeItem: removeItem,
-    searchByTags: searchByTags
-    //router.post("/updateFav", OutfitsController.updateFav);
+    searchByTags: searchByTags,
+    updateFav: updateFav 
 };
 
 module.exports = ItemsController;

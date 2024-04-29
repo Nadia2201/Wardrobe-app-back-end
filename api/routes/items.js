@@ -6,6 +6,6 @@ router.post("/", ItemsController.create);
 router.get("/:id", ItemsController.getItem);
 router.delete("/:id", ItemsController.removeItem);
 router.post("/search", ItemsController.searchByTags);
-//router.post("/updateFav", OutfitsController.updateFav);
+router.post("/updateFav", ItemsController.updateFav);
 
 module.exports = router;

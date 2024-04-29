@@ -117,13 +117,32 @@ const createManual = async (req, res) => {
         }
     };
 
+const updateFav = async (req, res) => {
+    try {
+        objectId = req.body._id;
+
+        const updatedOutfit = await Outfit.findOneAndUpdate(
+            { _id: objectId },
+            { favourite: true }, // Set favourite to true
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedOutfit) {
+            return res.status(404).json({ error: "Item not found" });
+        }
+
+        res.status(200).json({ message: "Outfit favourite status updated", updatedOutfit });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 const OutfitsController = {
     create: create,
     createManual: createManual,
     createByTag: createByTag,
     //getFavourites: getFavourites
-    //updateFav: updateFav
+    updateFav: updateFav
   };
   
   module.exports = OutfitsController;
