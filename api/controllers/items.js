@@ -1,47 +1,159 @@
 const Item = require("../models/item");
 const fs = require('fs');
 const { getUserIdFromToken } = require("../middleware/tokenChecker")
-
+const { getGFSBucket } = require("../models/gridfsbucket"); // Import the GridFSBucket instance
+const { Readable } = require('stream');
 
 // Function to create a new item
 const create = async (req, res) => {
-
-    const imageToBase64 = fs.readFileSync(req.body.image);
-    const base64Image = Buffer.from(imageToBase64).toString('base64');
-    const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
-    const userId = getUserIdFromToken(token);
-    
     try {
-        const itemDetails = { 
-            name: req.body.name, 
-            category: req.body.category, 
-            tags: req.body.tags, 
-            image: base64Image, 
-            userId: userId
-        };
- 
-        const item = new Item(itemDetails);
-        console.log('newItem', item);
+        const imageToBase64 = req.body.image;
+        const gfsBucket = getGFSBucket(); // Retrieve the GridFSBucket instance
+    
+        if (!imageToBase64) {
+            throw new Error("No image data provided");
+        }
 
-        await item.save();
-        res.status(201).json({ message: `Item created, id: ${item._id.toString()}`});
-    } 
-    catch (error) {
-        res.status(400).json({ message: `This went wrong: ${error.message}` });
+        const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
+        const userId = getUserIdFromToken(token);
+
+        // Decode the base64 image and convert it to a readable stream
+        const buffer = Buffer.from(imageToBase64, 'base64');
+        const readStream = new Readable();
+        readStream.push(buffer);
+        readStream.push(null);
+
+       // Create a write stream with GridFSBucket
+        const writeStream = gfsBucket.openUploadStream(`image-${Date.now()}.jpg`);
+
+        writeStream.on("error", (err) => {
+            console.error("Error during write stream:", err);
+            res.status(500).json({ message: "Error during upload", error: err });
+        });
+
+        // Pipe the read stream into GridFSBucket
+        readStream.pipe(writeStream);
+
+        // Once the stream is finished, create the Item document
+        writeStream.on("finish", () => {
+            const itemDetails = {
+                name: req.body.name,
+                category: req.body.category, 
+                tags: req.body.tags, 
+                image: writeStream.gridFSFile._id,
+                userId: userId
+            };
+    
+            const item = new Item(itemDetails);
+            console.log('new item = ', item);
+            item.save();
+            res.status(201).json({ message: `Item created, id: ${item._id.toString()}`});
+        });
+    } catch (err) {
+        res.status(500).json({ message: 'Error saving item', error: err });
     }
 };
 
 // Function to get item
-
 const getItem = async (req, res) => {
     try {
         const item = await Item.findById(req.params.id);
 
-        res.status(200).json(item);
+        if(!item) {
+            return res.status(404).send({ error: 'Item not found!' });
+        }
+
+        const gfsBucket = getGFSBucket(); // access GridFS to retrieve the image using GridFSBucket
+        const imageId = item.image; // get the reference for the image
+
+        //create a buffer to capture the image data
+        let imageBuffer = [];
+
+        //create a read stream from GridFS
+        const readStream = gfsBucket.openDownloadStream(imageId);
+
+        readStream.on("data", (chunk) => {
+            imageBuffer.push(chunk);
+        });
+
+        readStream.on("end", () => {
+            //convert buffer to Base64
+            const imageBase64 = Buffer.concat(imageBuffer).toString('base64');
+
+            // return item details along with the Base64 image
+            const response = {
+                id: item._id,
+                name: item.name,
+                category: item.category,
+                image: imageBase64,
+                tags: item.tags,
+            };
+
+            console.log(response)
+            res.send(response);
+        });
+
+        readStream.on("error", (error) => {
+            res.status(500).send({ error: error.message });
+        });
+
     } catch (error) {
-        res.status(400).send({ message: "Couldn't retrieve item"});
+        res.status(500).send({ error: error.message });
     }
-}
+};
+
+// function to get all items (max of 10)
+const getAllItems = async (req, res) => {
+    try {
+        const items = await Item.find();
+        const gfsBucket = getGFSBucket();
+        const response = [];
+
+        for(const item of items) {
+            const imageId = item.image;
+
+            let imageBase64 = "";
+
+            if(imageId) {
+                //read the image from GridFS
+                const imageBuffer = await new Promise((resolve, reject) => {
+                    const chunks = [];
+                    const readStream = gfsBucket.openDownloadStream(imageId);
+
+                    readStream.on("data", (chunk) => {
+                        chunks.push(chunk);
+                    });
+
+                    readStream.on("end", () => {
+                        resolve(Buffer.concat(chunks));
+                    });
+
+                    readStream.on("error", (err) => {
+                        reject(err);
+                    });
+                });
+
+                imageBase64 = imageBuffer.toString("base64");
+            }
+            // include the item details with base64 encoded image
+            response.push({
+                id: item._id,
+                name: item.name,
+                category: item.category,
+                tags: item.tags,
+                image: imageBase64,
+            });
+        }
+
+        console.log(response)
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching all items", error: err });
+    }
+};
+
+
+
 
 // Function to remove item
 
@@ -72,8 +184,9 @@ const searchByTags = async (req, res) => {
 const ItemsController = {
     create: create,
     getItem: getItem,
+    getAllItems: getAllItems,
     removeItem: removeItem,
-    searchByTags: searchByTags
+    searchByTags: searchByTags,
 };
 
 module.exports = ItemsController;

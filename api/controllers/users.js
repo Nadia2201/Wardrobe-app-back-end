@@ -4,15 +4,15 @@ const bcrypt = require('bcryptjs');
 const fs = require('fs');
 
 const create = async (req, res) => {
-  const imageToBase64 = fs.readFileSync(req.body.imgUrl);
-  const base64Image = Buffer.from(imageToBase64).toString('base64');
+  // const imageToBase64 = fs.readFileSync(req.body.imgUrl);
+  // const base64Image = Buffer.from(imageToBase64).toString('base64');
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const userDetails = {
       email: req.body.email,
       password: hashedPassword,
       username: req.body.username,
-      imgUrl: base64Image
+      // imgUrl: base64Image
     };
 
     const user = new User(userDetails);
