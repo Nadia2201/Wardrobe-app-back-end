@@ -18,7 +18,7 @@ const create = async (req, res) => {
                 { $match: { category: "bottom" } },
                 { $sample: { size: 1 } }
             ]);
-            randomBottom = bottom[0]._id;
+            randomBottom = bottom[0].name;
         }
 
         // Find a random pair of "shoes"
@@ -28,26 +28,102 @@ const create = async (req, res) => {
         ]);
 
         const outfitDetails = { 
-            top: randomTopOrDress[0]._id,
+            top: randomTopOrDress[0].name,
             bottom: randomBottom,
-            shoes: randomShoes[0]._id
-            //image: req.body.image - this is an advanced feature to place the items as one image
+            shoes: randomShoes[0].name
+            //image: this is an advanced feature to place the items as one image
         };
 
         const outfit = new Outfit(outfitDetails);
         console.log('newOutfit', Outfit);
 
         await outfit.save();
-        res.status(201).json({ message: `Outfit created, id: ${outfit._id.toString()}`});
+        res.status(201).json({ outfit });
 
-    } catch (error) {
-        // Handle errors
+        } catch (error) {
         res.status(500).send({ error: error.message });
-    }
+        }
+    };
+
+const createByTag = async (req, res) => {
+    try {
+        //take the info from payload ["occasion_type", "weather_type"]
+        let occasion_type = req.body[0];
+        let weather_type = req.body[1];
+
+        const randomTopOrDress = await Item.aggregate([
+           { $match: { tags: { $all: [occasion_type, weather_type] } } },
+            { $match: { category: { $in: ["top", "dress"] } } },
+            { $sample: { size: 1 } }
+        ]);
+        console.log('randomTopOrDress:', randomTopOrDress)
+
+        // Find a random "bottom" if "top" was selected
+        let randomBottom = "";
+        if (randomTopOrDress[0].category === "top") {
+            const bottom = await Item.aggregate([
+                { $match: { tags: { $all: [occasion_type, weather_type] } } },
+                { $match: { category: "bottom" } },
+                { $sample: { size: 1 } }
+            ]);
+            randomBottom = bottom[0].name;
+        }
+
+        // Find a random pair of "shoes"
+        const randomShoes = await Item.aggregate([
+            { $match: { tags: { $all: [occasion_type, weather_type] } } },
+            { $match: { category: "shoes" } },
+            { $sample: { size: 1 } }
+        ]);
+
+        const outfitDetails = { 
+            top: randomTopOrDress[0].name,
+            bottom: randomBottom,
+            shoes: randomShoes[0].name
+            //image: this is an advanced feature to place the items as one image
+        };
+
+        const outfit = new Outfit(outfitDetails);
+        console.log('newOutfit', Outfit);
+
+        await outfit.save();
+        res.status(201).json({ outfit });
+
+        } catch (error) {
+        res.status(500).send({ error: error.message });
+        }
     };
     
+
+const createManual = async (req, res) => {
+    try {
+        //unpack the payload data. Expected data: _id of items.  
+        
+        // const outfitDetails = { 
+        //     top: randomTopOrDress[0]._id,
+        //     bottom: //
+        //     shoes: //
+        //     //image: req.body.image - this is an advanced feature to place the items as one image
+        // };
+
+        const outfit = new Outfit(outfitDetails);
+        console.log('newOutfit', Outfit);
+
+        await outfit.save();
+        res.status(201).json({ outfit });
+
+        } catch (error) {
+        res.status(500).send({ error: error.message });
+        }
+    };
+
+
 const OutfitsController = {
     create: create,
+    createManual: createManual,
+    createByTag: createByTag,
+    //getFavourites: getFavourites
+    //updateFav: updateFav
   };
   
   module.exports = OutfitsController;

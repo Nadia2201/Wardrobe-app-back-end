@@ -64,6 +64,7 @@ const ItemsController = {
     getItem: getItem,
     removeItem: removeItem,
     searchByTags: searchByTags
+    //router.post("/updateFav", OutfitsController.updateFav);
 };
 
 module.exports = ItemsController;
