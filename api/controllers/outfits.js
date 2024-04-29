@@ -99,16 +99,24 @@ const createByTag = async (req, res) => {
 const createManual = async (req, res) => {
     try {
         //unpack the payload data. Expected data: _id of items.  
+        top = req.body.top;
+        shoes = req.body.shoes;
+        if (req.body._id === !null) {
+            bottom = req.body._id
+        } else { 
+            bottom = ""
+        }
         
-        // const outfitDetails = { 
-        //     top: randomTopOrDress[0]._id,
-        //     bottom: //
-        //     shoes: //
-        //     //image: req.body.image - this is an advanced feature to place the items as one image
-        // };
+        const outfitDetails = { 
+            top: top,
+            bottom: bottom,
+            shoes: shoes
+            //image: req.body.image - this is an advanced feature to place the items as one image
+        };
+        console.log('top:', top, 'bottom:', bottom, 'shoes', shoes);
 
         const outfit = new Outfit(outfitDetails);
-        console.log('newOutfit', Outfit);
+        console.log('newOutfit', outfit);
 
         await outfit.save();
         res.status(201).json({ outfit });
