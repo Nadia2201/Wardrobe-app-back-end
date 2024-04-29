@@ -1,13 +1,20 @@
 const Item = require("../models/item");
 const fs = require('fs');
-const { getUserIdFromToken } = require("../middleware/tokenChecker")
+const { getUserIdFromToken } = require("../middleware/tokenChecker");
+const JWT = require("jsonwebtoken");
 
 
 // Function to create a new item
 const create = async (req, res) => {
-
-    const imageToBase64 = fs.readFileSync(req.body.image);
-    const base64Image = Buffer.from(imageToBase64).toString('base64');
+    let base64Image;
+    if (req.body.image) {
+        try {
+            const imageToBase64 = fs.readFileSync(req.body.image);
+            base64Image = Buffer.from(imageToBase64).toString('base64');
+        } catch (error) {
+            console.error("Error reading image file:", error);
+        }
+    }
     const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
     const userId = getUserIdFromToken(token);
     
@@ -30,6 +37,7 @@ const create = async (req, res) => {
         res.status(400).json({ message: `This went wrong: ${error.message}` });
     }
 };
+
 
 // Function to get item
 
