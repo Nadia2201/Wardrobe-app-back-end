@@ -77,13 +77,24 @@ const updateFav = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+// get all favourite outfits
+const getFavourites = async (req, res) => {
+    try {
+        const favoriteItems = await Item.find({ favourite: true });
+        res.status(200).json({ items: favoriteItems });
+     } catch (error) {
+        res.status(500).json({ error: error.message });
+  }
+};
+
 
 const ItemsController = {
     create: create,
     getItem: getItem,
     removeItem: removeItem,
     searchByTags: searchByTags,
-    updateFav: updateFav 
+    updateFav: updateFav,
+    getFavourites: getFavourites 
 };
 
 module.exports = ItemsController;

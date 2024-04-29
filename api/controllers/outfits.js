@@ -45,9 +45,11 @@ const create = async (req, res) => {
         }
     };
 
+//Generate a random outfit based on occasion and weather
+
 const createByTag = async (req, res) => {
     try {
-        //take the info from payload ["occasion_type", "weather_type"]
+        //take the info from payload: ["occasion_type", "weather_type"]
         let occasion_type = req.body[0];
         let weather_type = req.body[1];
 
@@ -56,7 +58,6 @@ const createByTag = async (req, res) => {
             { $match: { category: { $in: ["top", "dress"] } } },
             { $sample: { size: 1 } }
         ]);
-        console.log('randomTopOrDress:', randomTopOrDress)
 
         // Find a random "bottom" if "top" was selected
         let randomBottom = "";
@@ -117,8 +118,11 @@ const createManual = async (req, res) => {
         }
     };
 
+//Update Favourite field from false (default) to true
+
 const updateFav = async (req, res) => {
     try {
+        //find document by outfit ID sent through the payload 
         objectId = req.body._id;
 
         const updatedOutfit = await Outfit.findOneAndUpdate(
@@ -137,11 +141,21 @@ const updateFav = async (req, res) => {
     }
 };
 
+// get all favourite outfits
+const getFavourites = async (req, res) => {
+    try {
+        const favoriteOutfits = await Outfit.find({ favourite: true });
+        res.status(200).json({ outfits: favoriteOutfits });
+     } catch (error) {
+        res.status(500).json({ error: error.message });
+  }
+};
+
 const OutfitsController = {
     create: create,
     createManual: createManual,
     createByTag: createByTag,
-    //getFavourites: getFavourites
+    getFavourites: getFavourites,
     updateFav: updateFav
   };
   
