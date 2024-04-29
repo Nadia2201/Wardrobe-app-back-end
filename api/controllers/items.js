@@ -1,11 +1,20 @@
 const Item = require("../models/item");
 const fs = require('fs');
+
+
+const JWT = require("jsonwebtoken");
+
+
+
+    
+
 const { getUserIdFromToken } = require("../middleware/tokenChecker")
 const { getGFSBucket } = require("../models/gridfsbucket"); // Import the GridFSBucket instance
 const { Readable } = require('stream');
 
 // Function to create a new item
 const create = async (req, res) => {
+
     try {
         const imageToBase64 = req.body.image;
         const gfsBucket = getGFSBucket(); // Retrieve the GridFSBucket instance
@@ -53,6 +62,7 @@ const create = async (req, res) => {
         res.status(500).json({ message: 'Error saving item', error: err });
     }
 };
+
 
 // Function to get item
 const getItem = async (req, res) => {
