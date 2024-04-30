@@ -3,9 +3,17 @@ const mongoose = require("mongoose");
 const ItemSchema = new mongoose.Schema({
     name: { type: String, required: true},
     category: { type: String, required: true},
-    tags: [{ type: String }], //lumped season; occasion; colour 
-    image: { type: String}, // Base64 encoded image
+
+   
+
+    tags: [{ type: String }],
+    image: { type: mongoose.Schema.Types.ObjectId, ref: 'uploads' },
     favourite: { type: Boolean, default: false }, 
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }
+
 });
 
 const Item = mongoose.model("Item", ItemSchema);

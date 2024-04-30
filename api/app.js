@@ -4,28 +4,38 @@ const cors = require("cors");
 
 const usersRouter = require("./routes/users");
 const itemsRouter = require("./routes/items");
-const outfitsRouter = require("./routes/outfits")
-
+const outfitsRouter = require("./routes/outfits");
 const authenticationRouter = require("./routes/authentication");
-
-const tokenChecker = require("./middleware/tokenChecker");
-
+const { tokenChecker } = require("./middleware/tokenChecker"); // Destructure the middleware object
 
 const app = express();
 
-// Allow requests from any client
-// docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-// docs: https://expressjs.com/en/resources/middleware/cors.html
 app.use(cors());
 
+
+
+
 // Parse JSON request bodies, made available on `req.body`
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '10mb'}));
+
 
 // API Routes
 app.use("/users", usersRouter);
 app.use("/items", itemsRouter);
-app.use("/tokens", authenticationRouter);
 app.use("/outfits", outfitsRouter);
+app.use("/tokens", authenticationRouter);
+
+// Logout route with tokenChecker middleware
+app.post("/users/logout", tokenChecker, async (req, res) => {
+  try {
+    // Optionally perform any additional logout logic here
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 // 404 Handler
 app.use((_req, res) => {
@@ -41,5 +51,7 @@ app.use((err, _req, res, _next) => {
     res.status(500).json({ err: "Something went wrong" });
   }
 });
+
+
 
 module.exports = app;

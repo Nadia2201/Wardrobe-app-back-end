@@ -3,6 +3,7 @@ const ItemsController = require("../controllers/items");
 const router = express.Router();
 
 router.post("/", ItemsController.create);
+router.get("/", ItemsController.getAllItems);
 router.get("/favourites", ItemsController.getFavourites); //this route must go before get "/:id"
 router.get("/:id", ItemsController.getItem);
 router.delete("/:id", ItemsController.removeItem);
