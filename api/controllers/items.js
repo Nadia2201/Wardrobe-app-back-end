@@ -190,6 +190,35 @@ const searchByTags = async (req, res) => {
     }
 }
 
+const updateFav = async (req, res) => {
+    try {
+        _id = req.body._id;
+
+        const updatedItem = await Item.findOneAndUpdate(
+            { _id: _id },
+            { favourite: true }, // Set favourite to true
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedItem) {
+            return res.status(404).json({ error: "Item not found" });
+        }
+
+        res.status(200).json({ message: "Item favourite status updated", updatedItem });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+// get all favourite outfits
+const getFavourites = async (req, res) => {
+    try {
+        const favoriteItems = await Item.find({ favourite: true });
+        res.status(200).json({ items: favoriteItems });
+     } catch (error) {
+        res.status(500).json({ error: error.message });
+  }
+};
+
 
 const ItemsController = {
     create: create,
@@ -197,6 +226,8 @@ const ItemsController = {
     getAllItems: getAllItems,
     removeItem: removeItem,
     searchByTags: searchByTags,
+    updateFav: updateFav,
+    getFavourites: getFavourites 
 };
 
 module.exports = ItemsController;
