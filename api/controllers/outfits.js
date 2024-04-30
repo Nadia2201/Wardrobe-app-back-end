@@ -18,7 +18,7 @@ const create = async (req, res) => {
                 { $match: { category: "bottom" } },
                 { $sample: { size: 1 } }
             ]);
-            randomBottom = bottom[0].name;
+            randomBottom = bottom[0]._id;
         }
 
         // Find a random pair of "shoes"
@@ -28,9 +28,9 @@ const create = async (req, res) => {
         ]);
 
         const outfitDetails = { 
-            top: randomTopOrDress[0].name,
+            top: randomTopOrDress[0]._id,
             bottom: randomBottom,
-            shoes: randomShoes[0].name
+            shoes: randomShoes[0]._id
             //image: this is an advanced feature to place the items as one image
         };
 
@@ -67,7 +67,7 @@ const createByTag = async (req, res) => {
                 { $match: { category: "bottom" } },
                 { $sample: { size: 1 } }
             ]);
-            randomBottom = bottom[0].name;
+            randomBottom = bottom[0]._id;
         }
 
         // Find a random pair of "shoes"
@@ -78,9 +78,9 @@ const createByTag = async (req, res) => {
         ]);
 
         const outfitDetails = { 
-            top: randomTopOrDress[0].name,
+            top: randomTopOrDress[0]._id,
             bottom: randomBottom,
-            shoes: randomShoes[0].name
+            shoes: randomShoes[0]._id
             //image: this is an advanced feature to place the items as one image
         };
 
@@ -99,16 +99,24 @@ const createByTag = async (req, res) => {
 const createManual = async (req, res) => {
     try {
         //unpack the payload data. Expected data: _id of items.  
+        top = req.body.top;
+        shoes = req.body.shoes;
+        if (req.body._id === !null) {
+            bottom = req.body._id
+        } else { 
+            bottom = ""
+        }
         
-        // const outfitDetails = { 
-        //     top: randomTopOrDress[0]._id,
-        //     bottom: //
-        //     shoes: //
-        //     //image: req.body.image - this is an advanced feature to place the items as one image
-        // };
+        const outfitDetails = { 
+            top: top,
+            bottom: bottom,
+            shoes: shoes
+            //image: req.body.image - this is an advanced feature to place the items as one image
+        };
+        console.log('top:', top, 'bottom:', bottom, 'shoes', shoes);
 
         const outfit = new Outfit(outfitDetails);
-        console.log('newOutfit', Outfit);
+        console.log('newOutfit', outfit);
 
         await outfit.save();
         res.status(201).json({ outfit });
@@ -118,24 +126,28 @@ const createManual = async (req, res) => {
         }
     };
 
-//Update Favourite field from false (default) to true
+//Update Favourite field from true to false / false to true 
 
 const updateFav = async (req, res) => {
     try {
         //find document by outfit ID sent through the payload 
         objectId = req.body._id;
+        favStatus = req.body.status;
 
         const updatedOutfit = await Outfit.findOneAndUpdate(
             { _id: objectId },
-            { favourite: true }, // Set favourite to true
+            { favourite: favStatus }, // Set favourite to true or false
             { new: true } // Return the updated document
         );
 
         if (!updatedOutfit) {
-            return res.status(404).json({ error: "Item not found" });
+            return res.status(404).json({ error: error.message });
         }
 
-        res.status(200).json({ message: "Outfit favourite status updated", updatedOutfit });
+        res.status(200).json({
+            message: updatedOutfit.favourite ? "Your outfit is now favorited" : "You have unfavorited this outfit",
+            updatedOutfit,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

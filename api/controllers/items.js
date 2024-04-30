@@ -192,24 +192,30 @@ const searchByTags = async (req, res) => {
 
 const updateFav = async (req, res) => {
     try {
-        _id = req.body._id;
+        //find document by outfit ID sent through the payload 
+        objectId = req.body._id;
+        favStatus = req.body.status;
 
         const updatedItem = await Item.findOneAndUpdate(
-            { _id: _id },
-            { favourite: true }, // Set favourite to true
+            { _id: objectId },
+            { favourite: favStatus }, // Set favourite to true or false
             { new: true } // Return the updated document
         );
 
         if (!updatedItem) {
-            return res.status(404).json({ error: "Item not found" });
+            return res.status(404).json({ error: error.message });
         }
 
-        res.status(200).json({ message: "Item favourite status updated", updatedItem });
+        res.status(200).json({
+            message: updatedItem.favourite ? "Your item is now favorited" : "You have unfavorited this item",
+            updatedItem,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
-// get all favourite outfits
+
+// get all favourite items
 const getFavourites = async (req, res) => {
     try {
         const favoriteItems = await Item.find({ favourite: true });
