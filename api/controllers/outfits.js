@@ -18,7 +18,7 @@ const create = async (req, res) => {
                 { $match: { category: "bottom" } },
                 { $sample: { size: 1 } }
             ]);
-            randomBottom = bottom[0].name;
+            randomBottom = bottom[0]._id;
         }
 
         // Find a random pair of "shoes"
@@ -28,9 +28,9 @@ const create = async (req, res) => {
         ]);
 
         const outfitDetails = { 
-            top: randomTopOrDress[0].name,
+            top: randomTopOrDress[0]._id,
             bottom: randomBottom,
-            shoes: randomShoes[0].name
+            shoes: randomShoes[0]._id
             //image: this is an advanced feature to place the items as one image
         };
 
@@ -67,7 +67,7 @@ const createByTag = async (req, res) => {
                 { $match: { category: "bottom" } },
                 { $sample: { size: 1 } }
             ]);
-            randomBottom = bottom[0].name;
+            randomBottom = bottom[0]._id;
         }
 
         // Find a random pair of "shoes"
@@ -78,9 +78,9 @@ const createByTag = async (req, res) => {
         ]);
 
         const outfitDetails = { 
-            top: randomTopOrDress[0].name,
+            top: randomTopOrDress[0]._id,
             bottom: randomBottom,
-            shoes: randomShoes[0].name
+            shoes: randomShoes[0]._id
             //image: this is an advanced feature to place the items as one image
         };
 
