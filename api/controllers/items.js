@@ -196,26 +196,26 @@ const updateFav = async (req, res) => {
         objectId = req.body._id;
         favStatus = req.body.status;
 
-        const updatedOutfit = await Outfit.findOneAndUpdate(
+        const updatedItem = await Item.findOneAndUpdate(
             { _id: objectId },
             { favourite: favStatus }, // Set favourite to true or false
             { new: true } // Return the updated document
         );
 
-        if (!updatedOutfit) {
+        if (!updatedItem) {
             return res.status(404).json({ error: error.message });
         }
 
         res.status(200).json({
-            message: updatedOutfit.favourite ? "Your outfit is now favorited" : "You have unfavorited this outfit",
-            updatedOutfit,
+            message: updatedItem.favourite ? "Your item is now favorited" : "You have unfavorited this item",
+            updatedItem,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-// get all favourite outfits
+// get all favourite items
 const getFavourites = async (req, res) => {
     try {
         const favoriteItems = await Item.find({ favourite: true });
