@@ -126,24 +126,28 @@ const createManual = async (req, res) => {
         }
     };
 
-//Update Favourite field from false (default) to true
+//Update Favourite field from true to false / false to true 
 
 const updateFav = async (req, res) => {
     try {
         //find document by outfit ID sent through the payload 
         objectId = req.body._id;
+        favStatus = req.body.status;
 
         const updatedOutfit = await Outfit.findOneAndUpdate(
             { _id: objectId },
-            { favourite: true }, // Set favourite to true
+            { favourite: favStatus }, // Set favourite to true or false
             { new: true } // Return the updated document
         );
 
         if (!updatedOutfit) {
-            return res.status(404).json({ error: "Item not found" });
+            return res.status(404).json({ error: error.message });
         }
 
-        res.status(200).json({ message: "Outfit favourite status updated", updatedOutfit });
+        res.status(200).json({
+            message: updatedOutfit.favourite ? "Your outfit is now favorited" : "You have unfavorited this outfit",
+            updatedOutfit,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
