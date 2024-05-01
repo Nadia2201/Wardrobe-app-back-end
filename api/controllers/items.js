@@ -152,10 +152,15 @@ const getAllItems = async (req, res) => {
                 category: item.category,
                 tags: item.tags,
                 image: imageBase64,
+                favourite: item.favourite,
             });
+            if(item.favourite) {
+                console.log(item.id, item.name, item.favourite)
+            }
+            
         }
 
-        console.log(response)
+        
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({ message: "Error fetching all items", error: err });
@@ -196,6 +201,7 @@ const updateFav = async (req, res) => {
         objectId = req.body._id;
         favStatus = req.body.status;
 
+        console.log(objectId, favStatus)
         const updatedItem = await Item.findOneAndUpdate(
             { _id: objectId },
             { favourite: favStatus }, // Set favourite to true or false
@@ -206,6 +212,7 @@ const updateFav = async (req, res) => {
             return res.status(404).json({ error: error.message });
         }
 
+        console.log('updatedItem:', updatedItem)
         res.status(200).json({
             message: updatedItem.favourite ? "Your item is now favorited" : "You have unfavorited this item",
             updatedItem,
