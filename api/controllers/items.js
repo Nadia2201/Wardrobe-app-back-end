@@ -1,13 +1,6 @@
 const Item = require("../models/item");
 const fs = require('fs');
-
-
 const JWT = require("jsonwebtoken");
-
-
-
-    
-
 const { getUserIdFromToken } = require("../middleware/tokenChecker")
 const { getGFSBucket } = require("../models/gridfsbucket"); // Import the GridFSBucket instance
 const { Readable } = require('stream');
