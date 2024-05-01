@@ -1,10 +1,13 @@
 const Outfit = require("../models/outfit");
 const Item = require('../models/item');
+const { getUserIdFromToken } = require("../middleware/tokenChecker")
 // const { generateToken } = require("../lib/token");
 
 // Generate a random outfit: pull items from 'items' collection randomly, save it in 'outfit' collection.  
 
 const create = async (req, res) => {
+    const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
+    const userId = getUserIdFromToken(token);
     try {
         const randomTopOrDress = await Item.aggregate([
             { $match: { category: { $in: ["top", "dress"] } } },
@@ -30,7 +33,8 @@ const create = async (req, res) => {
         const outfitDetails = { 
             top: randomTopOrDress[0]._id,
             bottom: randomBottom,
-            shoes: randomShoes[0]._id
+            shoes: randomShoes[0]._id,
+            userId: userId
             //image: this is an advanced feature to place the items as one image
         };
 
@@ -48,6 +52,8 @@ const create = async (req, res) => {
 //Generate a random outfit based on occasion and weather
 
 const createByTag = async (req, res) => {
+    const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
+    const userId = getUserIdFromToken(token);
     try {
         //take the info from payload: ["occasion_type", "weather_type"]
         let occasion_type = req.body[0];
@@ -80,7 +86,8 @@ const createByTag = async (req, res) => {
         const outfitDetails = { 
             top: randomTopOrDress[0]._id,
             bottom: randomBottom,
-            shoes: randomShoes[0]._id
+            shoes: randomShoes[0]._id,
+            userId: userId
             //image: this is an advanced feature to place the items as one image
         };
 
@@ -97,6 +104,8 @@ const createByTag = async (req, res) => {
     
 
 const createManual = async (req, res) => {
+    const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
+    const userId = getUserIdFromToken(token);
     try {
         //unpack the payload data. Expected data: _id of items.  
         top = req.body.top;
@@ -104,13 +113,14 @@ const createManual = async (req, res) => {
         if (req.body._id === !null) {
             bottom = req.body._id
         } else { 
-            bottom = ""
+            bottom = req.body.bottom;
         }
         
         const outfitDetails = { 
             top: top,
             bottom: bottom,
-            shoes: shoes
+            shoes: shoes,
+            userId: userId
             //image: req.body.image - this is an advanced feature to place the items as one image
         };
         console.log('top:', top, 'bottom:', bottom, 'shoes', shoes);
@@ -155,6 +165,7 @@ const updateFav = async (req, res) => {
 
 // get all favourite outfits
 const getFavourites = async (req, res) => {
+    
     try {
         const favoriteOutfits = await Outfit.find({ favourite: true });
         res.status(200).json({ outfits: favoriteOutfits });
