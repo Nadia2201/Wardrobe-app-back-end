@@ -56,46 +56,72 @@ const createByTag = async (req, res) => {
     const userId = getUserIdFromToken(token);
     try {
         //take the info from payload: ["occasion_type", "weather_type"]
-        let occasion_type = req.body[0];
-        let weather_type = req.body[1];
+        let occasion_type = req.body.occasion;
+        let weather_type = req.body.weather;
+
+        console.log(occasion_type, weather_type)
 
         const randomTopOrDress = await Item.aggregate([
-           { $match: { tags: { $all: [occasion_type, weather_type] } } },
-            { $match: { category: { $in: ["top", "dress"] } } },
-            { $sample: { size: 1 } }
+            {
+                $match: {
+                    $and: [
+                        { tags: { $all: [occasion_type, weather_type] } }, // Match all specified tags
+                        { category: { $in: ["top", "dress"] } } // Match specific categories
+                    ]
+                }
+            },
+            { $sample: { size: 1 } } // Get a random item
         ]);
 
         // Find a random "bottom" if "top" was selected
         let randomBottom = "";
-        if (randomTopOrDress[0].category === "top") {
-            const bottom = await Item.aggregate([
-                { $match: { tags: { $all: [occasion_type, weather_type] } } },
-                { $match: { category: "bottom" } },
-                { $sample: { size: 1 } }
-            ]);
-            randomBottom = bottom[0]._id;
-        }
 
+        console.log('random top or dress', randomTopOrDress)
+        if(randomTopOrDress.length > 0) {
+            if (randomTopOrDress[0].category === "top") {
+                const bottom = await Item.aggregate([
+                    { $match: { tags: { $all: [occasion_type, weather_type] } } },
+                    { $match: { category: "bottom" } },
+                    { $sample: { size: 1 } }
+                ]);
+                console.log("bottom", bottom)
+                randomBottom = bottom.length === 0 ? "" : bottom[0]._id;
+            }
+        }
+        
         // Find a random pair of "shoes"
         const randomShoes = await Item.aggregate([
             { $match: { tags: { $all: [occasion_type, weather_type] } } },
             { $match: { category: "shoes" } },
             { $sample: { size: 1 } }
         ]);
+        console.log("random shoes", randomShoes)
 
         const outfitDetails = { 
-            top: randomTopOrDress[0]._id,
+            top: randomTopOrDress.length === 0 ? "" : randomTopOrDress[0]._id,
             bottom: randomBottom,
-            shoes: randomShoes[0]._id,
+            shoes: randomShoes.length === 0 ? "" :  randomShoes[0]._id,
             userId: userId
             //image: this is an advanced feature to place the items as one image
         };
 
         const outfit = new Outfit(outfitDetails);
-        console.log('newOutfit', Outfit);
+        // console.log('newOutfit', outfitDetails);
 
         await outfit.save();
-        res.status(201).json({ outfit });
+
+        let sendData = {
+            id: outfit._id,
+            top: outfit.top,
+            bottom: outfit.bottom,
+            shoes: outfit.shoes,
+            favourite: outfit.favourite,
+            createdAt: outfit.createdAt
+        }
+
+        console.log('send data', sendData)
+        // res.status(201).json({outfit});
+        res.status(201).json(sendData);
 
         } catch (error) {
         res.status(500).send({ error: error.message });

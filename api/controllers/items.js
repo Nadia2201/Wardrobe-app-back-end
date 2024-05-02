@@ -153,7 +153,7 @@ const getAllItems = async (req, res) => {
             
         }
 
-        
+        console.log("fetch all items", response)
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({ message: "Error fetching all items", error: err });
